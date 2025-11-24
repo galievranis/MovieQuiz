@@ -2,10 +2,10 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     // MARK: - Outlets
-    
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet var buttonCollection: [UIButton]!
     
     // MARK: - Variables
     private struct QuizQuestion {
@@ -18,6 +18,12 @@ final class MovieQuizViewController: UIViewController {
       let image: UIImage
       let question: String
       let questionNumber: String
+    }
+    
+    struct QuizResultsViewModel {
+        let title: String
+        let text: String
+        let buttonText: String
     }
     
     private let questions: [QuizQuestion] = [
@@ -82,6 +88,7 @@ final class MovieQuizViewController: UIViewController {
         
         let currentQuestion = questions[currentQuestionIndex]
         let question = convert(model: currentQuestion)
+        
         show(quiz: question)
     }
     
@@ -110,13 +117,71 @@ final class MovieQuizViewController: UIViewController {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        
+        resetImageBorder()
+        toggleButtonsState(isEnabled: true)
+    }
+    
+    private func show(quiz result: QuizResultsViewModel) {
+        let alert = UIAlertController(
+                title: result.title,
+                message: result.text,
+                preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            let firstQuestion = self.questions[self.currentQuestionIndex]
+            let viewModel = self.convert(model: firstQuestion)
+            self.show(quiz: viewModel)
+        }
+            
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
     }
     
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        
+        if isCorrect {
+            correctAnswers += 1
+        }
+        
+        toggleButtonsState(isEnabled: false)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showNextQuestionOrResults()
+        }
+    }
+    
+    private func showNextQuestionOrResults() {
+        if currentQuestionIndex == questions.count - 1 {
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: "Ваш результат: \(correctAnswers)/\(questions.count)",
+                buttonText: "Сыграть ещё раз")
+            show(quiz: viewModel)
+        } else {
+            currentQuestionIndex += 1
+            let nextQuestion = questions[currentQuestionIndex]
+            let viewModel = convert(model: nextQuestion)
+            show(quiz: viewModel)
+            resetImageBorder()
+        }
+    }
+    
+    private func resetImageBorder() {
+        imageView.layer.borderWidth = 0
+    }
+    
+    private func toggleButtonsState(isEnabled: Bool) {
+        print("Enable:", isEnabled, "buttons:", buttonCollection.count)
+        for button in buttonCollection {
+            button.isEnabled = isEnabled
+        }
     }
 }
 
