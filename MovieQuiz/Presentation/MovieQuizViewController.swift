@@ -13,7 +13,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
-    private var alertPresenter = AlertPresenter()
+    private var resultAlertPresenter = ResultAlertPresenter()
+    private var statisticService: StatisticServiceProtocol?
     
     // MARK: - View Lifecycle
     override func viewDidLoad() {
@@ -24,6 +25,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.questionFactory = questionFactory
         
         questionFactory.requestNextQuestion()
+        statisticService = StatisticService()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -88,7 +90,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.questionFactory?.requestNextQuestion()
         }
         
-        alertPresenter.show(in: self, with: alert)
+        resultAlertPresenter.show(in: self, with: alert)
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -110,9 +112,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
+            statisticService?.store(
+                correct: correctAnswers,
+                total: questionsAmount
+            )
+            
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
+                text: makeResultMessage(),
                 buttonText: "Сыграть ещё раз")
             show(quiz: viewModel)
         } else {
@@ -132,5 +139,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         for button in answerButtons {
             button.isEnabled = isEnabled
         }
+    }
+    
+    private func makeResultMessage() -> String {
+        guard let statisticService = statisticService else {
+            return "Статистика недоступна"
+        }
+        
+        let bestGame = statisticService.bestGame
+        let currentResult = "Ваш результат: \(correctAnswers)/\(questionsAmount)\n"
+        let gamesPlayed = "Количество сыгранных квизов: \(statisticService.gamesCount)\n"
+        let bestGameText = "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n"
+        let accuracyText = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+        
+        return [
+                currentResult,
+                gamesPlayed,
+                bestGameText,
+                accuracyText
+        ].joined()
     }
 }
