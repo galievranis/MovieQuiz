@@ -13,7 +13,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
-    private var resultAlertPresenter = ResultAlertPresenter()
+//    private var resultAlertPresenter = ResultAlertPresenter()
     private var statisticService: StatisticServiceProtocol?
     
     // MARK: - View Lifecycle
@@ -83,14 +83,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             message: result.text,
             buttonText: result.buttonText
         ) { [weak self] in
-            guard let self = self else {return}
-            
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            self.questionFactory?.requestNextQuestion()
+            self?.currentQuestionIndex = 0
+            self?.correctAnswers = 0
+            self?.questionFactory?.requestNextQuestion()
         }
         
-        resultAlertPresenter.show(in: self, with: alert)
+        ResultAlertPresenter.show(in: self, with: alert)
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -147,16 +145,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         
         let bestGame = statisticService.bestGame
-        let currentResult = "Ваш результат: \(correctAnswers)/\(questionsAmount)\n"
-        let gamesPlayed = "Количество сыгранных квизов: \(statisticService.gamesCount)\n"
-        let bestGameText = "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n"
-        let accuracyText = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
         
-        return [
-                currentResult,
-                gamesPlayed,
-                bestGameText,
-                accuracyText
-        ].joined()
+        return """
+            Ваш результат: \(correctAnswers)/\(questionsAmount)
+            Количество сыгранных квизов: \(statisticService.gamesCount)
+            Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
+            Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+            """
     }
 }

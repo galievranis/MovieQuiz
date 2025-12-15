@@ -1,5 +1,5 @@
 //
-//  AlertPresenter.swift
+//  ResultAlertPresenter.swift
 //  MovieQuiz
 //
 //  Created by Ranis Galiev on 11.12.2025.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-class ResultAlertPresenter {
-    func show(in viewController: UIViewController, with model: AlertModel) {
+final class ResultAlertPresenter {
+    static func show(in viewController: UIViewController, with model: AlertModel) {
         let alert = UIAlertController(
             title: model.title,
             message: model.message,
