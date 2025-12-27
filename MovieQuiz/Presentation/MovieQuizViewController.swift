@@ -6,6 +6,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
     @IBOutlet private var answerButtons: [UIButton]!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Private Properties
     private var currentQuestionIndex: Int = 0
@@ -152,5 +153,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
             Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
             """
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать ещё раз"
+        ) { [weak self] in
+            self?.currentQuestionIndex = 0
+            self?.correctAnswers = 0
+            self?.questionFactory?.requestNextQuestion()
+        }
+        
+        ResultAlertPresenter.show(in: self, with: alert)
     }
 }
