@@ -14,19 +14,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
-//    private var resultAlertPresenter = ResultAlertPresenter()
     private var statisticService: StatisticServiceProtocol?
     
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory()
-        questionFactory.delegate = self
-        self.questionFactory = questionFactory
-        
-        questionFactory.requestNextQuestion()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticService()
+        showLoadingIndicator()
+        
+        questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -41,6 +39,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    
+    func didLoadDataFromServer() {
+        hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - IB Actions
@@ -63,7 +70,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Private Methods
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
@@ -162,12 +169,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func hideLoadingIndicator() {
         activityIndicator.isHidden = true
-        activityIndicator.stopAnimating()
     }
     
     private func showNetworkError(message: String) {
-        hideLoadingIndicator()
-        
         let alert = AlertModel(
             title: "Ошибка",
             message: message,
