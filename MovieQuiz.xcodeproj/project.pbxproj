@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		880C291A2F00577200B2D351 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880C29192F00576E00B2D351 /* NetworkClient.swift */; };
 		8818DF342EE745DE0062612B /* QuestionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8818DF332EE745DE0062612B /* QuestionFactory.swift */; };
 		8818DF362EE7473F0062612B /* QuizStepViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8818DF352EE7473F0062612B /* QuizStepViewModel.swift */; };
 		8818DF3A2EE7475B0062612B /* QuizResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8818DF392EE7475B0062612B /* QuizResultsViewModel.swift */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		880C29192F00576E00B2D351 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		8818DF332EE745DE0062612B /* QuestionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactory.swift; sourceTree = "<group>"; };
 		8818DF352EE7473F0062612B /* QuizStepViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizStepViewModel.swift; sourceTree = "<group>"; };
 		8818DF392EE7475B0062612B /* QuizResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizResultsViewModel.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 		6113423A2B701CF8003FC2A4 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				880C29192F00576E00B2D351 /* NetworkClient.swift */,
 				889452E42EEEF68A0089A2B9 /* StatisticService.swift */,
 				889452E02EEEF49E0089A2B9 /* StatisticServiceProtocol.swift */,
 				8818DF3F2EE94FB50062612B /* QuestionFactoryDelegate.swift */,
@@ -242,6 +245,7 @@
 				882586592EEB249700D871FD /* AlertModel.swift in Sources */,
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
 				889452E32EEEF50E0089A2B9 /* GameResult.swift in Sources */,
+				880C291A2F00577200B2D351 /* NetworkClient.swift in Sources */,
 				8818DF3E2EE810B80062612B /* QuestionFactoryProtocol.swift in Sources */,
 				8818DF402EE94FB80062612B /* QuestionFactoryDelegate.swift in Sources */,
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,
