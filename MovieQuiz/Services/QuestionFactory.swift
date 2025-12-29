@@ -8,58 +8,17 @@
 import Foundation
 
 final class QuestionFactory: QuestionFactoryProtocol {
-//    private let questions: [QuizQuestion] = [
-//        QuizQuestion(
-//            image: "The Godfather",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "The Dark Knight",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "Kill Bill",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "The Avengers",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "Deadpool",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "The Green Knight",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true
-//        ),
-//        QuizQuestion(
-//            image: "Old",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false
-//        ),
-//        QuizQuestion(
-//            image: "The Ice Age Adventures of Buck Wild",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false
-//        ),
-//        QuizQuestion(
-//            image: "Tesla",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false
-//        ),
-//        QuizQuestion(
-//            image: "Vivarium",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false
-//        )
-//    ]
+    private enum ComparisonType: CaseIterable {
+        case greater
+        case less
+        
+        var text: String {
+            switch self {
+            case .greater: return "больше"
+            case .less: return "меньше"
+            }
+        }
+    }
     
     private var movies: [MostPopularMovie] = []
     private let moviesLoader: MoviesLoading
@@ -95,25 +54,47 @@ final class QuestionFactory: QuestionFactoryProtocol {
             
             var imageData = Data()
            
-           do {
+            do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                print("Failed to load image")
+                DispatchQueue.main.async {
+                    self.delegate?.didFailToLoadData(with: error)
+                }
+                return
             }
             
             let rating = Float(movie.rating) ?? 0
-            
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
-            
-            let question = QuizQuestion(image: imageData,
-                                         text: text,
-                                         correctAnswer: correctAnswer)
+            let question = self.generateQuestion(rating: rating, imageData: imageData)
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
         }
+    }
+    
+    private func generateQuestion(rating: Float, imageData: Data) -> QuizQuestion {
+        guard let comparisonType = ComparisonType.allCases.randomElement() else {
+            fatalError("Отсутствуют опции у ComparisonType")
+        }
+        
+        let minThreshold = max(0, rating - 1.0)
+        let maxThreshold = min(10, rating + 1.0)
+        let threshold = Float.random(in: minThreshold...maxThreshold)
+        
+        let correctAnswer: Bool
+        switch comparisonType {
+        case .greater:
+            correctAnswer = rating > threshold
+        case .less:
+            correctAnswer = rating < threshold
+        }
+        
+        let thresholdForUI = Int(threshold.rounded())
+        let text: String = "Рейтинг этого фильма \(comparisonType.text), чем \(thresholdForUI)?"
+            
+        return QuizQuestion(image: imageData,
+                            text: text,
+                            correctAnswer: correctAnswer)
     }
 }

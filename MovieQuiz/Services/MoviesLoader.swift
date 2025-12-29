@@ -8,6 +8,20 @@
 import Foundation
 
 struct MoviesLoader: MoviesLoading {
+    private enum MoviesLoaderError: LocalizedError {
+        case apiError(String)
+        case emptyMoviesList
+        
+        var errorDescription: String? {
+            switch self {
+            case .apiError(let message):
+                return message
+            case .emptyMoviesList:
+                return "Не удалось загрузить список фильмов."
+            }
+        }
+    }
+    
     // MARK: - NetworkClient
     private let networkClient = NetworkClient()
     
@@ -26,6 +40,17 @@ struct MoviesLoader: MoviesLoading {
             case .success(let data):
                 do {
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    
+                    if !mostPopularMovies.errorMessage.isEmpty {
+                        handler(.failure(MoviesLoaderError.apiError(mostPopularMovies.errorMessage)))
+                        return
+                    }
+                    
+                    if mostPopularMovies.items.isEmpty {
+                        handler(.failure(MoviesLoaderError.emptyMoviesList))
+                        return
+                    }
+                    
                     handler(.success(mostPopularMovies))
                 } catch {
                     handler(.failure(error))
