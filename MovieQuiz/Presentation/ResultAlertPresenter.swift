@@ -17,7 +17,8 @@ final class ResultAlertPresenter {
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
             model.completion?()
         }
-            
+        
+        alert.view.accessibilityIdentifier = model.accessibilityIdentifier
         alert.addAction(action)
         viewController.present(alert, animated: true, completion: nil)
     }
