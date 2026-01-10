@@ -26,17 +26,18 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testYesButton() {
+        // Given
         sleep(3)
         
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
         
+        // When
         app.buttons["Yes"].tap()
         sleep(3)
         
-        let secondPoster = app.images["Poster"]
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
-        
+        // Then
+        let secondPosterData = app.images["Poster"].screenshot().pngRepresentation
         let indexLabel = app.staticTexts["Index"]
         
         XCTAssertNotEqual(firstPosterData, secondPosterData)
@@ -44,17 +45,18 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testNoButton() {
+        // Given
         sleep(3)
         
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
         
+        // When
         app.buttons["No"].tap()
         sleep(3)
         
-        let secondPoster = app.images["Poster"]
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
-        
+        // Then
+        let secondPosterData = app.images["Poster"].screenshot().pngRepresentation
         let indexLabel = app.staticTexts["Index"]
         
         XCTAssertNotEqual(firstPosterData, secondPosterData)
@@ -62,13 +64,16 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testGameIsFinished() {
+        // Given
         sleep(2)
         
+        // When
         for _ in 1...10 {
             app.buttons["Yes"].tap()
             sleep(2)
         }
         
+        // Then
         let alert = app.alerts["Game result"]
         
         XCTAssertTrue(alert.exists)
@@ -77,8 +82,10 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testAlertDismiss() {
+        // Given
         sleep(2)
         
+        // When
         for _ in 1...10 {
             app.buttons["Yes"].tap()
             sleep(2)
@@ -89,6 +96,7 @@ final class MovieQuizUITests: XCTestCase {
         
         sleep(2)
         
+        // Then
         let indexLabel = app.staticTexts["Index"]
         
         XCTAssertFalse(alert.exists)
